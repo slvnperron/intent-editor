@@ -6,17 +6,29 @@
 .editor-body {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap-reverse;
+  flex-wrap: nowrap;
   align-items: stretch;
 }
 
 .utterances {
-  min-width: 400px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.entities-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 p.utterance {
   margin: 0;
   font-size: 16px;
+}
+
+.utterance .mark-slot {
+  cursor: pointer;
 }
 
 p.utterance.title {

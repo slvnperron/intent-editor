@@ -1,6 +1,8 @@
 import React from 'react'
 import cx from 'classnames'
 
+import { slotShortcuts } from './constants'
+
 class EntitiesBar extends React.PureComponent {
   render() {
     if (this.props.selection.from !== this.props.selection.to) {
@@ -28,9 +30,11 @@ class EntitiesBar extends React.PureComponent {
         <p>
           Click a slot to tag it or press the keyboard shortcut (the number).
         </p>
-        {this.props.slots.map((slot, idx) =>
-          this.renderSlot(slot, idx + 1, true)
-        )}
+        <div className="entities-list">
+          {this.props.slots.map((slot, idx) =>
+            this.renderSlot(slot, idx, true)
+          )}
+        </div>
       </div>
     )
   }
@@ -47,8 +51,10 @@ class EntitiesBar extends React.PureComponent {
       )
     }
 
-    return this.props.slots.map((slot, idx) =>
-      this.renderSlot(slot, idx + 1, false)
+    return (
+      <div className="entities-list">
+        {this.props.slots.map((slot, idx) => this.renderSlot(slot, idx, false))}
+      </div>
     )
   }
 
@@ -59,11 +65,15 @@ class EntitiesBar extends React.PureComponent {
       'color-fg': !tagMode
     })
 
-    const suffix = tagMode ? <span className="suffix idx">{idx}</span> : null
+    const suffix = tagMode ? (
+      <span className="suffix idx">{slotShortcuts[idx]}</span>
+    ) : null
 
     return (
       <span
-        onClick={() => this.props.onTag(idx)}
+        onClick={() =>
+          tagMode ? this.props.onTag(idx, this.props.editor) : null
+        }
         key={`slot-${idx}`}
         className={cn}
       >

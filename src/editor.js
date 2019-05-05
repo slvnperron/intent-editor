@@ -1,11 +1,13 @@
 import { Editor } from 'slate-react'
-import { Block, Value, Data } from 'slate'
+import { Block, Value, Data, Range } from 'slate'
 import PlaceholderPlugin from 'slate-react-placeholder'
 
 import cx from 'classnames'
 
 import React from 'react'
 import initialValueAsJson from './value.json'
+
+import { slotShortcuts } from './constants'
 
 import Entities from './entities'
 
@@ -20,15 +22,16 @@ const plugins = [
   })
 ]
 
-function BoldMark(props) {
-  if (props.mark.data.get('color')) {
-    return (
-      <strong style={{ color: props.mark.data.get('color') }}>
-        {props.children}
-      </strong>
-    )
-  }
-  return <strong>{props.children}</strong>
+function SlotMark(props) {
+  const slot = props.mark.data.toJS()
+  const cn = cx('mark-slot', 'color-bg', `color-${slot.color}`)
+  const remove = () =>
+    props.editor.moveToRangeOfNode(props.node).removeMark(props.mark)
+  return (
+    <span onClick={remove} className={cn}>
+      {props.children}
+    </span>
+  )
 }
 
 const initialValue = Value.fromJSON(initialValueAsJson)
@@ -57,27 +60,20 @@ const schema = {
 class ForcedLayout extends React.Component {
   state = { selection: { utterance: -1, block: -1, from: -1, to: -1 } }
   utteranceKeys = []
+  editorRef = null
 
   onKeyDown = (event, editor, next) => {
-    if (!event.ctrlKey) return next()
+    const somethingSelected =
+      this.state.selection.from !== this.state.selection.to
+    const shortcutIdx = slotShortcuts.indexOf(event.key)
 
-    console.log(event.key)
-
-    // Decide what to do based on the key code...
-    switch (event.key) {
-      // When "B" is pressed, add a "bold" mark to the text.
-      case 'b': {
-        event.preventDefault()
-        editor.toggleMark({
-          type: 'bold',
-          data: Data.fromJSON({ color: 'blue' })
-        })
-        break
+    if (somethingSelected && shortcutIdx > -1) {
+      event.preventDefault()
+      if (shortcutIdx < this.props.slots.length) {
+        this.onTag(shortcutIdx, editor)
       }
-      // Otherwise, let other plugins handle it.
-      default: {
-        return next()
-      }
+    } else {
+      return next()
     }
   }
 
@@ -101,6 +97,7 @@ class ForcedLayout extends React.Component {
   renderEditor = (props, editor, next) => {
     const children = next()
 
+    this.editorRef = editor
     this.utteranceKeys = editor.value
       .getIn(['document', 'nodes'])
       .map(x => x.key)
@@ -117,6 +114,7 @@ class ForcedLayout extends React.Component {
           <div className="entities">
             <Entities
               editor={editor}
+              onTag={this.onTag}
               selection={this.state.selection}
               onCreateSlot={this.props.onCreateSlot}
               availableEntities={this.props.availableEntities}
@@ -128,8 +126,52 @@ class ForcedLayout extends React.Component {
     )
   }
 
-  onTag = idx => {
-    console.log(idx)
+  onTag = (idx, editor) => {
+    const { utterance, block } = this.state.selection
+    let { from, to } = this.state.selection
+
+    const node = editor.value.getIn([
+      'document',
+      'nodes',
+      utterance,
+      'nodes',
+      block
+    ])
+
+    const content = node.text
+
+    // We're trimming white spaces in the tagging (forward and backward)
+    while (from < to && !content.charAt(from).trim().length) {
+      from++
+    }
+    do {
+      to--
+    } while (to > from && !content.charAt(to).trim().length)
+
+    if (from >= to) {
+      // Trimming screwed up selection (nothing to tag)
+      return
+    }
+
+    const range = Range.fromJS({
+      anchor: { path: [utterance, block], offset: from },
+      focus: {
+        path: [utterance, block],
+        offset: Math.min(content.length, to + 1)
+      }
+    })
+
+    const mark = {
+      type: 'slot',
+      data: Data.fromJSON(this.props.slots[idx])
+    }
+
+    const marks = editor.value.get('document').getActiveMarksAtRange(range)
+    if (marks.size) {
+      marks.forEach(m => editor.select(range).replaceMark(m, mark))
+    } else {
+      editor.select(range).addMark(mark)
+    }
   }
 
   onChange = ({ value, operations }) => {
@@ -157,12 +199,14 @@ class ForcedLayout extends React.Component {
       }
       this.setState({ selection: { utterance, block, from, to } })
     }
+
+    return value
   }
 
   renderMark = (props, editor, next) => {
     switch (props.mark.type) {
-      case 'bold':
-        return <BoldMark {...props} />
+      case 'slot':
+        return <SlotMark {...props} />
       default:
         return next()
     }
