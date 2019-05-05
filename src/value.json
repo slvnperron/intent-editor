@@ -1,0 +1,167 @@
+{
+  "object": "value",
+  "document": {
+    "object": "document",
+    "data": {},
+    "nodes": [
+      {
+        "object": "block",
+        "type": "title",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "text": "Book flight",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "text": "Fly from ",
+            "marks": []
+          },
+          {
+            "object": "text",
+            "text": "Quebec",
+            "marks": [
+              {
+                "object": "mark",
+                "type": "bold",
+                "data": {}
+              }
+            ]
+          },
+          {
+            "object": "text",
+            "text": " to ",
+            "marks": []
+          },
+          {
+            "object": "text",
+            "text": "Montreal",
+            "marks": [
+              {
+                "object": "mark",
+                "type": "bold",
+                "data": {}
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "text": "Book a flight from ",
+            "marks": []
+          },
+          {
+            "object": "text",
+            "text": "Montreal",
+            "marks": [
+              {
+                "object": "mark",
+                "type": "bold",
+                "data": {}
+              }
+            ]
+          },
+          {
+            "object": "text",
+            "text": " to Quebec",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "text": "Flight from ",
+            "marks": []
+          },
+          {
+            "object": "text",
+            "text": "Montreal",
+            "marks": [
+              {
+                "object": "mark",
+                "type": "bold",
+                "data": {}
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "text": "I'm going to ",
+            "marks": []
+          },
+          {
+            "object": "text",
+            "text": "Quebec",
+            "marks": [
+              {
+                "object": "mark",
+                "type": "bold",
+                "data": {}
+              }
+            ]
+          },
+          {
+            "object": "text",
+            "text": ", book from ",
+            "marks": []
+          },
+          {
+            "object": "text",
+            "text": "montreal",
+            "marks": [
+              {
+                "object": "mark",
+                "type": "bold",
+                "data": {}
+              }
+            ]
+          },
+          {
+            "object": "text",
+            "text": " please",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "text": "",
+            "marks": []
+          }
+        ]
+      }
+    ]
+  }
+}

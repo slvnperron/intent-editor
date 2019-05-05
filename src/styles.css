@@ -1,0 +1,24 @@
+.App {
+  font-family: sans-serif;
+  text-align: left;
+}
+
+p.utterance {
+  margin: 0;
+}
+
+p.utterance.title {
+  font-weight: bold;
+}
+
+p.utterance.title + p.utterance {
+  margin-top: 10px;
+}
+
+p.utterance + p.utterance {
+  margin-top: 5px;
+}
+
+p.utterance.active {
+  background: yellow;
+}
