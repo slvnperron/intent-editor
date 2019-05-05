@@ -1,7 +1,7 @@
 {
-  "name": "new",
+  "name": "2029-intent-editor",
   "version": "1.0.0",
-  "description": "",
+  "description": "A very basic implementation of the new intent intent editor for BP2029",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {

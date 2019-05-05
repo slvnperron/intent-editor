@@ -20,20 +20,6 @@ const plugins = [
   })
 ]
 
-const availableEntities = [
-  { name: 'Date and Time', type: 'system.date', description: '' },
-  { name: 'Ordinal Numbers', type: 'system.ordinal', description: '' },
-  { name: 'Any one word', type: 'system.anyOne', description: '' },
-  { name: 'Any many words', type: 'system.anyMany', description: '' },
-  { name: 'City', type: 'list.city', description: '' }
-]
-
-/**
- * Deserialize the initial editor value.
- *
- * @type {Object}
- */
-
 function BoldMark(props) {
   if (props.mark.data.get('color')) {
     return (
@@ -46,12 +32,6 @@ function BoldMark(props) {
 }
 
 const initialValue = Value.fromJSON(initialValueAsJson)
-
-/**
- * A simple schema to enforce the nodes in the Slate document.
- *
- * @type {Object}
- */
 
 const schema = {
   document: {
@@ -74,23 +54,14 @@ const schema = {
   }
 }
 
-/**
- * The Forced Layout example.
- *
- * @type {Component}
- */
-
 class ForcedLayout extends React.Component {
-  /**
-   * Render the editor.
-   *
-   * @return {Component} component
-   */
-
   state = { selection: { utterance: -1, block: -1, from: -1, to: -1 } }
+  utteranceKeys = []
 
   onKeyDown = (event, editor, next) => {
     if (!event.ctrlKey) return next()
+
+    console.log(event.key)
 
     // Decide what to do based on the key code...
     switch (event.key) {
@@ -112,23 +83,53 @@ class ForcedLayout extends React.Component {
 
   render() {
     return (
-      <div>
-        <Entities
-          selection={this.state.selection}
-          entities={availableEntities}
-        />
-        <Editor
-          placeholder="Enter utterance..."
-          defaultValue={initialValue}
-          schema={schema}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          onKeyDown={this.onKeyDown}
-          onChange={this.onChange}
-          plugins={plugins}
-        />
+      <Editor
+        placeholder="Enter utterance..."
+        defaultValue={initialValue}
+        schema={schema}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+        onKeyDown={this.onKeyDown}
+        shouldNodeComponentUpdate={this.shouldNodeComponentUpdate}
+        renderEditor={this.renderEditor}
+        onChange={this.onChange}
+        plugins={plugins}
+      />
+    )
+  }
+
+  renderEditor = (props, editor, next) => {
+    const children = next()
+
+    this.utteranceKeys = editor.value
+      .getIn(['document', 'nodes'])
+      .map(x => x.key)
+      .toJS()
+
+    return (
+      <div className="editor-container">
+        <div>{this.utteranceKeys.length} utterances</div>
+
+        <div className="editor-body">
+          <div className="utterances" editor={editor}>
+            {children}
+          </div>
+          <div className="entities">
+            <Entities
+              editor={editor}
+              selection={this.state.selection}
+              onCreateSlot={this.props.onCreateSlot}
+              availableEntities={this.props.availableEntities}
+              slots={this.props.slots}
+            />
+          </div>
+        </div>
       </div>
     )
+  }
+
+  onTag = idx => {
+    console.log(idx)
   }
 
   onChange = ({ value, operations }) => {
@@ -139,8 +140,11 @@ class ForcedLayout extends React.Component {
       let utterance = -1
       let block = -1
       if (
-        // the editor has to be focused for tagging
-        v.isFocused &&
+        // Something is actually selected
+        v.anchor &&
+        v.anchor.path &&
+        v.focus &&
+        v.focus.path &&
         // Make sure we're in the same utterance (you can't tag cross-utterance)
         v.anchor.path['0'] === v.focus.path['0'] &&
         // Make sure we're not wrapping an other entity inside an other entity
@@ -164,45 +168,17 @@ class ForcedLayout extends React.Component {
     }
   }
 
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @param {Editor} editor
-   * @param {Function} next
-   * @return {Element}
-   */
-
-  renderMetadata = () => {
-    const { selection } = this.state
-    console.log('hello')
-    if (
-      selection &&
-      selection.utterance > -1 &&
-      selection.from !== selection.to
-    ) {
-      return (
-        <div>
-          <div>TAG THIS</div>
-          <div># of utterances</div>
-        </div>
-      )
-    }
-
-    // console.log(editor.unwrapBlock('text'))
-    return (
-      <div>
-        <div>List of Entities</div>
-        <div># of utterances</div>
-      </div>
-    )
-  }
-
   renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
+
+    const utteranceIdx = this.utteranceKeys.indexOf(node.key)
+    const isEmpty = node.text.trim().length <= 0
+    const isWrong = utteranceIdx < this.utteranceKeys.length - 1 && isEmpty
+
     const elementCx = cx('utterance', {
       title: node.type === 'title',
-      active: props.isFocused
+      active: props.isFocused,
+      wrong: isWrong
     })
 
     switch (node.type) {
@@ -210,6 +186,15 @@ class ForcedLayout extends React.Component {
       case 'paragraph':
         return (
           <p className={elementCx} {...attributes}>
+            {utteranceIdx > 0 ? (
+              <span contentEditable={false} className="index">
+                {utteranceIdx}
+              </span>
+            ) : (
+              <span contentEditable={false} className="index">
+                T
+              </span>
+            )}
             {children}
           </p>
         )
@@ -218,9 +203,5 @@ class ForcedLayout extends React.Component {
     }
   }
 }
-
-/**
- * Export.
- */
 
 export default ForcedLayout

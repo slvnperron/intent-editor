@@ -3,16 +3,29 @@
   text-align: left;
 }
 
+.editor-body {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+  align-items: stretch;
+}
+
+.utterances {
+  min-width: 400px;
+}
+
 p.utterance {
   margin: 0;
+  font-size: 16px;
 }
 
 p.utterance.title {
   font-weight: bold;
+  font-size: 18px;
 }
 
 p.utterance.title + p.utterance {
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 p.utterance + p.utterance {
@@ -21,4 +34,84 @@ p.utterance + p.utterance {
 
 p.utterance.active {
   background: yellow;
+}
+
+p.utterance.wrong {
+  color: red;
+}
+
+p.utterance .index {
+  margin-right: 5px;
+  opacity: 0.5;
+}
+
+/* ---------- */
+/* SLOTS COLORING */
+/* ---------- */
+
+.slot {
+  padding: 3px;
+  margin-right: 5px;
+  border: 1px solid;
+  cursor: pointer;
+}
+
+.slot:hover {
+  font-weight: bold;
+}
+
+.slot .suffix {
+  padding: 3px;
+  background-color: #888;
+  border-radius: 5px;
+  margin-left: 5px;
+}
+
+.color-bg {
+  color: white;
+  background-color: grey;
+}
+.color-bg.color-0 {
+  color: white;
+  background-color: red;
+}
+.color-bg.color-1 {
+  color: white;
+  background-color: blue;
+}
+.color-bg.color-2 {
+  color: white;
+  background-color: green;
+}
+.color-bg.color-3 {
+  color: white;
+  background-color: purple;
+}
+.color-bg.color-4 {
+  color: white;
+  background-color: fuchsia;
+}
+.color-fg {
+  border-color: grey;
+  color: grey;
+}
+.color-fg.color-0 {
+  border-color: red;
+  color: red;
+}
+.color-fg.color-1 {
+  border-color: blue;
+  color: blue;
+}
+.color-fg.color-2 {
+  border-color: green;
+  color: green;
+}
+.color-fg.color-3 {
+  border-color: purple;
+  color: purple;
+}
+.color-fg.color-4 {
+  border-color: fuchsia;
+  color: fuchsia;
 }
