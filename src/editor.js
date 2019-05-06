@@ -63,6 +63,19 @@ class ForcedLayout extends React.Component {
   editorRef = null
 
   onKeyDown = (event, editor, next) => {
+    if (event.key === 'Enter') {
+      const doc = editor.value.get('document')
+      const marks = doc.getActiveMarksAtRange(editor.value.selection)
+
+      if (marks.size) {
+        event.preventDefault()
+        return editor
+          .moveToEndOfText()
+          .moveForward()
+          .insertBlock('paragraph')
+      }
+    }
+
     const somethingSelected =
       this.state.selection.from !== this.state.selection.to
     const shortcutIdx = slotShortcuts.indexOf(event.key)

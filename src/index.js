@@ -48,7 +48,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <h1>Hello CodeSandbox2</h1>
+        <h1>Intent Editor</h1>
         <IntentEditor
           slots={this.state.slots}
           availableEntities={availableEntities}
