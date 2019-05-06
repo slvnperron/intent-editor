@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import { Value } from 'slate'
+
 import IntentEditor from './editor'
 import './styles.css'
 
@@ -42,15 +44,52 @@ const prebuiltSlots = [
   }
 ]
 
+const restoreCache = () => {
+  const initialIntentsValue = window.localStorage.getItem('bp-intents')
+  const initialSlotsValue = window.localStorage.getItem('bp-slots')
+  const value =
+    typeof initialIntentsValue === 'string'
+      ? Value.fromJS(JSON.parse(initialIntentsValue))
+      : null
+  const slots =
+    typeof initialSlotsValue === 'string' ? JSON.parse(initialSlotsValue) : []
+  return { slots, value }
+}
+
+const clearCache = () => {
+  window.localStorage.removeItem('bp-intents')
+  window.localStorage.removeItem('bp-slots')
+}
+
 class App extends React.Component {
-  state = { slots: [] }
+  state = restoreCache()
+
+  onValueChanged = value => {
+    this.setState({ value }, () => {
+      window.localStorage.setItem(
+        'bp-intents',
+        JSON.stringify(this.state.value.toJS())
+      )
+      window.localStorage.setItem('bp-slots', JSON.stringify(this.state.slots))
+    })
+  }
 
   render() {
     return (
       <div className="App">
         <h1>Intent Editor</h1>
+        <p>
+          Actions:{' '}
+          <a href="#" onClick={clearCache}>
+            Clear the cache
+          </a>
+        </p>
+        <hr />
+        <br />
         <IntentEditor
           slots={this.state.slots}
+          value={this.state.value}
+          onChange={this.onValueChanged}
           availableEntities={availableEntities}
           onCreateSlot={() => this.setState({ slots: prebuiltSlots })}
         />

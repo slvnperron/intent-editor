@@ -91,14 +91,17 @@ class ForcedLayout extends React.Component {
       this.state.selection.from !== this.state.selection.to
     const shortcutIdx = slotShortcuts.indexOf(event.key)
 
-    if (somethingSelected && shortcutIdx > -1) {
+    if (
+      somethingSelected &&
+      shortcutIdx > -1 &&
+      shortcutIdx < this.props.slots.length
+    ) {
       event.preventDefault()
-      if (shortcutIdx < this.props.slots.length) {
-        this.onTag(shortcutIdx, editor)
-      }
-    } else {
-      return next()
+      this.onTag(shortcutIdx, editor)
+      return
     }
+
+    return next()
   }
 
   render() {
@@ -106,6 +109,7 @@ class ForcedLayout extends React.Component {
       <Editor
         placeholder="Enter utterance..."
         defaultValue={initialValue}
+        value={this.props.value}
         schema={schema}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
@@ -200,31 +204,10 @@ class ForcedLayout extends React.Component {
 
   onChange = ({ value, operations }) => {
     if (operations.filter(x => x.get('type') === 'set_selection').size) {
-      const v = value.get('selection').toJS()
-      let from = -1
-      let to = -1
-      let utterance = -1
-      let block = -1
-      if (
-        // Something is actually selected
-        v.anchor &&
-        v.anchor.path &&
-        v.focus &&
-        v.focus.path &&
-        // Make sure we're in the same utterance (you can't tag cross-utterance)
-        v.anchor.path['0'] === v.focus.path['0'] &&
-        // Make sure we're not wrapping an other entity inside an other entity
-        v.anchor.path['1'] === v.focus.path['1']
-      ) {
-        utterance = v.anchor.path['0']
-        block = v.anchor.path['1']
-        from = Math.min(v.anchor.offset, v.focus.offset)
-        to = Math.max(v.anchor.offset, v.focus.offset)
-      }
-      this.setState({ selection: { utterance, block, from, to } })
+      this.onSelectionChanged(value)
     }
 
-    return value
+    this.props.onChange(value)
   }
 
   renderMark = (props, editor, next) => {
@@ -269,6 +252,31 @@ class ForcedLayout extends React.Component {
       default:
         return next()
     }
+  }
+
+  onSelectionChanged(value) {
+    const v = value.get('selection').toJS()
+    let from = -1
+    let to = -1
+    let utterance = -1
+    let block = -1
+    if (
+      // Something is actually selected
+      v.anchor &&
+      v.anchor.path &&
+      v.focus &&
+      v.focus.path &&
+      // Make sure we're in the same utterance (you can't tag cross-utterance)
+      v.anchor.path['0'] === v.focus.path['0'] &&
+      // Make sure we're not wrapping an other entity inside an other entity
+      v.anchor.path['1'] === v.focus.path['1']
+    ) {
+      utterance = v.anchor.path['0']
+      block = v.anchor.path['1']
+      from = Math.min(v.anchor.offset, v.focus.offset)
+      to = Math.max(v.anchor.offset, v.focus.offset)
+    }
+    this.setState({ selection: { utterance, block, from, to } })
   }
 }
 
