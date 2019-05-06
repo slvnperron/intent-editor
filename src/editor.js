@@ -133,8 +133,6 @@ class ForcedLayout extends React.Component {
 
     return (
       <div className="editor-container">
-        <div>{this.utteranceKeys.length} utterances</div>
-
         <div className="editor-body">
           <div className="utterances" editor={editor}>
             {children}
@@ -242,8 +240,8 @@ class ForcedLayout extends React.Component {
                 {utteranceIdx}
               </span>
             ) : (
-              <span contentEditable={false} className="index">
-                T
+              <span contentEditable={false} className="index count">
+                {this.utteranceKeys.length}
               </span>
             )}
             {children}

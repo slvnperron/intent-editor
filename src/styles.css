@@ -57,6 +57,12 @@ p.utterance .index {
   opacity: 0.5;
 }
 
+p.utterance .index.count {
+  background: lightgrey;
+  padding: 0 5px;
+  border-radius: 5px;
+}
+
 /* ---------- */
 /* SLOTS COLORING */
 /* ---------- */
