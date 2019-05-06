@@ -76,6 +76,17 @@ class ForcedLayout extends React.Component {
       }
     }
 
+    if (event.key === 'Backspace') {
+      const doc = editor.value.get('document')
+      const marks = doc.getActiveMarksAtRange(editor.value.selection)
+      if (marks.size) {
+        event.preventDefault()
+        editor.moveEndToEndOfText().moveStartToStartOfText()
+        marks.forEach(m => editor.removeMark(m))
+        return
+      }
+    }
+
     const somethingSelected =
       this.state.selection.from !== this.state.selection.to
     const shortcutIdx = slotShortcuts.indexOf(event.key)
